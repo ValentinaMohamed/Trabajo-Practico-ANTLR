@@ -4,10 +4,27 @@ programa : instruccion* EOF ;
 
 instruccion
     : imprimir
+    | declaracion
+    | asignacion
     ;
 
 imprimir
     : 'print' '(' expresion ')' ';'
+    ;
+
+declaracion
+    : 'var' ID ':' tipo ('=' expresion)? ';'
+    ;
+    
+asignacion
+    : ID '=' expresion ';'
+    ;
+
+tipo
+    : 'int'
+    | 'real'
+    | 'string'
+    | 'bool'
     ;
 
 expresion
@@ -15,11 +32,13 @@ expresion
     | ENTERO
     | REAL
     | BOOLEANO
+    | ID
     ;
 
+ID : [a-zA-Z_][a-zA-Z0-9_]* ;
 CADENA   : '"' .*? '"' ;
-ENTERO   : [0-9]+ ;
 REAL     : [0-9]+ '.' [0-9]+ ;
+ENTERO   : [0-9]+ ;
 BOOLEANO : 'true' | 'false' ;
 
 WS : [ \t\r\n]+ -> skip ;

@@ -6,12 +6,21 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
     	// Simula un archivo fuente con el código
-        CharStream input = CharStreams.fromString(
-        	    "print(\"Hola\");\n" +
-        	    "print(123);\n" +
-        	    "print(98.3);\n" +
-        	    "print(true);\n"
-        	);
+    	CharStream input = CharStreams.fromString(
+    			
+    		    "var saludo : string = \"Hola\";\n" +
+    		    "var numero : int = 1234;\n" +
+    		    "var numero_real : real = 98.3;\n" +
+    		    "var boolean : bool = true;\n" +
+
+    		    "print(saludo);\n" +
+    		    "print(numero);\n" +
+    		    "print(numero_real);\n" +
+    		    "print(boolean);\n" +
+    		    
+    		    "saludo = \"Chau\";\n" +
+    		    "print(saludo);\n"
+    		);
 
         // Convierte el texto en tokens
         MiniLangLexer lexer = new MiniLangLexer(input);
