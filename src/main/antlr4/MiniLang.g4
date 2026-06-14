@@ -26,13 +26,34 @@ tipo
     | 'string'
     | 'bool'
     ;
-
+    
 expresion
+    : expresionLogica
+    ;
+
+expresionLogica
+    : expresionRelacional (('&&' | '||') expresionRelacional)*
+    ;
+
+expresionRelacional
+    : expresionAritmetica (('==' | '!=' | '<' | '<=' | '>' | '>=') expresionAritmetica)?
+    ;
+
+expresionAritmetica
+    : termino (('+' | '-') termino)*
+    ;
+
+termino
+    : factor (('*' | '/') factor)*
+    ;
+
+factor
     : CADENA
     | ENTERO
     | REAL
     | BOOLEANO
     | ID
+    | '(' expresion ')'
     ;
 
 ID : [a-zA-Z_][a-zA-Z0-9_]* ;

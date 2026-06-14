@@ -15,12 +15,26 @@ public class Main {
     		    "var numero_real : real = 98.3;\n" +
     		    "var boolean : bool = true;\n" +
     		    
+                "// Expresiones\n" +
+                "var suma : int = numero + 10;\n" +
+                "var resta : int = numero - 10;\n" +
+                "var multiplicacion : real = numero_real * 2;\n" +
+                "var division : real = numero_real / 2;\n" +
+                "var comparacion : bool = numero > 100;\n" +
+                "var logico : bool = comparacion && true;\n" +
+    		    
                 "/* Impresión de variables */\n" +
 
     		    "print(saludo);\n" +
     		    "print(numero);\n" +
     		    "print(numero_real);\n" +
     		    "print(boolean);\n" +
+    		    "print(suma);\n" +
+    		    "print(resta);\n" +
+    		    "print(multiplicacion);\n" +
+    		    "print(division);\n" +
+    		    "print(comparacion);\n" +
+    		    "print(logico);\n" +
     		    
                 "// Cambio de valor\n" +
     		    
