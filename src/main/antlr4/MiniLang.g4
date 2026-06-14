@@ -41,4 +41,12 @@ REAL     : [0-9]+ '.' [0-9]+ ;
 ENTERO   : [0-9]+ ;
 BOOLEANO : 'true' | 'false' ;
 
+COMENTARIO_LINEA
+    : '//' ~[\r\n]* -> skip
+    ;
+
+COMENTARIO_BLOQUE
+    : '/*' .*? '*/' -> skip
+    ;
+
 WS : [ \t\r\n]+ -> skip ;
