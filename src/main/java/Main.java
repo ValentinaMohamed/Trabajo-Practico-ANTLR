@@ -3,6 +3,17 @@ import org.antlr.v4.runtime.tree.*;
 
 public class Main {
 
+	// Imprime el árbol por renglones
+	public static void printTree(ParseTree tree, Parser parser, int indent) {
+	    String indentStr = " ".repeat(indent);
+	    String nodeText = Trees.getNodeText(tree, parser);
+	    System.out.println(indentStr + nodeText);
+
+	    for (int i = 0; i < tree.getChildCount(); i++) {
+	        printTree(tree.getChild(i), parser, indent + 2);
+	    }
+	}
+	
     public static void main(String[] args) throws Exception {
 
     	// Simula un archivo fuente con el código
@@ -15,7 +26,9 @@ public class Main {
     		    "var numero_real : real = 98.3;\n" +
     		    "var boolean : bool = true;\n" +
     		    
+    		    
                 "// Expresiones\n" +
+                
                 "var suma : int = numero + 10;\n" +
                 "var resta : int = numero - 10;\n" +
                 "var multiplicacion : real = numero_real * 2;\n" +
@@ -23,6 +36,7 @@ public class Main {
                 "var comparacion : bool = numero > 100;\n" +
                 "var logico : bool = comparacion && true;\n" +
     		    
+                
                 "/* Impresión de variables */\n" +
 
     		    "print(saludo);\n" +
@@ -36,10 +50,20 @@ public class Main {
     		    "print(comparacion);\n" +
     		    "print(logico);\n" +
     		    
+    		    
                 "// Cambio de valor\n" +
     		    
     		    "saludo = \"Chau\";\n" +
-    		    "print(saludo);\n"
+    		    "print(saludo);\n" +
+    		    
+    		    
+    		    "// Do while\n" +
+    		    
+    		    "var i : int = 0;\n" +
+    		    "do {\n" +
+    		    "   print(i);\n" +
+    		    "   i = i + 1;\n" +
+    		    "} while (i < 3);\n"
     		);
 
         // Convierte el texto en tokens
@@ -53,6 +77,9 @@ public class Main {
         ParseTree tree = parser.programa();
 
         // Salida
-        System.out.println(tree.toStringTree(parser));
+        // System.out.println(tree.toStringTree(parser));
+        
+        // Salida árbol 
+        printTree(tree, parser, 0);
     }
 }

@@ -6,6 +6,7 @@ instruccion
     : imprimir
     | declaracion
     | asignacion
+    | doWhile
     ;
 
 imprimir
@@ -54,6 +55,10 @@ factor
     | BOOLEANO
     | ID
     | '(' expresion ')'
+    ;
+    
+doWhile
+    : 'do' '{' instruccion* '}' 'while' '(' expresion ')' ';'
     ;
 
 ID : [a-zA-Z_][a-zA-Z0-9_]* ;
