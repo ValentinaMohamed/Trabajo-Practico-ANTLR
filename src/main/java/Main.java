@@ -56,6 +56,16 @@ public class Main {
     		    "saludo = \"Chau\";\n" +
     		    "print(saludo);\n" +
     		    
+				
+				"// Condicional if-else\n" +
+
+				"var nota : int = 8;\n" +
+				"if (nota >= 6) {\n" +
+				"   print(\"Aprobado\");\n" +
+				"} else {\n" +
+				"   print(\"Desaprobado\");\n" +
+				"}\n" +
+				
     		    
     		    "// Do while\n" +
     		    

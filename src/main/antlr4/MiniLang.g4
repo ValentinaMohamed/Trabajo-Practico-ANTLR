@@ -6,6 +6,7 @@ instruccion
     : imprimir
     | declaracion
     | asignacion
+    | ifElse
     | doWhile
     ;
 
@@ -55,6 +56,11 @@ factor
     | BOOLEANO
     | ID
     | '(' expresion ')'
+    ;
+    
+ifElse
+    : 'if' '(' expresion ')' '{' instruccion* '}'
+      'else' '{' instruccion* '}'
     ;
     
 doWhile
