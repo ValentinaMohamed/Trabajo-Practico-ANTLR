@@ -59,19 +59,20 @@ factor
     ;
     
 ifElse
-    : 'if' '(' expresion ')' '{' instruccion* '}'
-      'else' '{' instruccion* '}'
+    : 'if' '(' expresion ')' '{' ifBlock+=instruccion* '}'
+      'else' '{' elseBlock+=instruccion* '}'
     ;
+
     
 doWhile
     : 'do' '{' instruccion* '}' 'while' '(' expresion ')' ';'
     ;
 
-ID : [a-zA-Z_][a-zA-Z0-9_]* ;
 CADENA   : '"' .*? '"' ;
 REAL     : [0-9]+ '.' [0-9]+ ;
 ENTERO   : [0-9]+ ;
 BOOLEANO : 'true' | 'false' ;
+ID : [a-zA-Z_][a-zA-Z0-9_]* ;
 
 COMENTARIO_LINEA
     : '//' ~[\r\n]* -> skip

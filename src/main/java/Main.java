@@ -73,15 +73,13 @@ public class Main {
     		    "do {\n" +
     		    "   print(i);\n" +
     		    "   i = i + 1;\n" +
-    		    "} while (i < 3);\n"
+    		    "} while (i < 5);\n"
     		);
 
         // Convierte el texto en tokens
         MiniLangLexer lexer = new MiniLangLexer(input);
-
         // Agrupa los tokens para que el parser los consuma.
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-
         // Usa la gramática para construir el árbol sintáctico.
         MiniLangParser parser = new MiniLangParser(tokens);
         ParseTree tree = parser.programa();
@@ -89,7 +87,16 @@ public class Main {
         // Salida
         // System.out.println(tree.toStringTree(parser));
         
-        // Salida árbol 
-        printTree(tree, parser, 0);
+        // 1. Imprimir árbol sintáctico
+        //printTree(tree, parser, 0);
+
+        // 2. Crear tabla de símbolos
+        SymbolTable symbolTable = new SymbolTable();
+
+        // 3. Ejecutar analizador semántico
+        SemanticAnalyzer semantic = new SemanticAnalyzer(symbolTable);
+        semantic.visit(tree);
+
+        System.out.println("Análisis semántico completado sin errores");
     }
 }
