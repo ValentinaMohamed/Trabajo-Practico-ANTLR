@@ -1,267 +1,264 @@
-public class SemanticAnalyzer extends MiniLangBaseVisitor<Object> {
+public class SemanticAnalyzer extends MiniLangBaseVisitor<String> {
+
     private SymbolTable symbolTable;
 
     public SemanticAnalyzer(SymbolTable symbolTable) {
         this.symbolTable = symbolTable;
     }
 
-    
-    // ---------------- Declaración ----------------
+    // ---------- Declaración ----------
     @Override
-    public Object visitDeclaracion(MiniLangParser.DeclaracionContext ctx) {
+    public String visitDeclaracion(MiniLangParser.DeclaracionContext ctx) {
         String name = ctx.ID().getText();
-        String type = ctx.tipo().getText();
+        String declaredType = ctx.tipo().getText();
 
         if (symbolTable.exists(name)) {
             throw new RuntimeException("Variable redeclarada: " + name);
         }
 
-        Object value = ctx.expresion() != null ? visit(ctx.expresion()) : null;
+        if (ctx.expresion() != null) {
+            String exprType = visit(ctx.expresion());
 
-        // Validar que el valor inicial coincida con el tipo declarado
-        if (value != null && !isCompatible(type, value)) {
-            throw new RuntimeException("Tipo incompatible en declaración: " + name +
-                                       " es " + type + " pero se asigna " +
-                                       value.getClass().getSimpleName());
+            if (!isCompatible(declaredType, exprType)) {
+                throw new RuntimeException(
+                    "Tipo incompatible en declaración: " + name +
+                    " es " + declaredType + " pero recibe " + exprType
+                );
+            }
         }
 
-        symbolTable.declare(name, type, value);
+        symbolTable.declare(name, declaredType, null);
         return null;
     }
 
-
-    // ---------------- Asignación ----------------
+    // ---------- Asignación ----------
     @Override
-    public Object visitAsignacion(MiniLangParser.AsignacionContext ctx) {
+    public String visitAsignacion(MiniLangParser.AsignacionContext ctx) {
         String name = ctx.ID().getText();
 
         if (!symbolTable.exists(name)) {
             throw new RuntimeException("Variable no declarada: " + name);
         }
 
-        Object value = visit(ctx.expresion());
         String declaredType = symbolTable.getType(name);
+        String exprType = visit(ctx.expresion());
 
-        // Validar compatibilidad
-        if (!isCompatible(declaredType, value)) {
-            throw new RuntimeException("Asignación inválida: " + name + " es " + declaredType +
-                                       " pero se intenta asignar " + value.getClass().getSimpleName());
+        if (!isCompatible(declaredType, exprType)) {
+            throw new RuntimeException(
+                "Asignación inválida: " + name +
+                " es " + declaredType + " pero recibe " + exprType
+            );
         }
 
-        symbolTable.assign(name, value);
         return null;
     }
 
-
-    // ---------------- Print ----------------
+    // ---------- Print ----------
     @Override
-    public Object visitImprimir(MiniLangParser.ImprimirContext ctx) {
-        Object value = visit(ctx.expresion());
-        System.out.println(value);
+    public String visitImprimir(MiniLangParser.ImprimirContext ctx) {
+        visit(ctx.expresion());
         return null;
     }
-    
-    // ---------------- If ----------------
-    @Override
-    public Object visitIfSimple(MiniLangParser.IfSimpleContext ctx) {
-        Object condition = visit(ctx.expresion());
 
-        if (!(condition instanceof Boolean)) {
+    // ---------- If ----------
+    @Override
+    public String visitIfSimple(MiniLangParser.IfSimpleContext ctx) {
+        String conditionType = visit(ctx.expresion());
+
+        if (!conditionType.equals("bool")) {
             throw new RuntimeException("La condición del if debe ser booleana");
         }
 
-        if ((Boolean) condition) {
-            for (MiniLangParser.InstruccionContext instr : ctx.instruccion()) {
-                visit(instr);
-            }
+        for (MiniLangParser.InstruccionContext instr : ctx.instruccion()) {
+            visit(instr); // se revisan todas las instrucciones, no se ejecutan
         }
 
         return null;
     }
-    
-    // ---------------- If-Else ----------------
+
+    // ---------- If-Else ----------
     @Override
-    public Object visitIfElse(MiniLangParser.IfElseContext ctx) {
-        Object condition = visit(ctx.expresion());
-        if (!(condition instanceof Boolean)) {
+    public String visitIfElse(MiniLangParser.IfElseContext ctx) {
+        String conditionType = visit(ctx.expresion());
+
+        if (!conditionType.equals("bool")) {
             throw new RuntimeException("La condición del if debe ser booleana");
         }
 
-        if ((Boolean) condition) {
-            for (MiniLangParser.InstruccionContext instr : ctx.ifBlock) {
-                visit(instr);
-            }
-        } else {
-            for (MiniLangParser.InstruccionContext instr : ctx.elseBlock) {
-                visit(instr);
-            }
+        for (MiniLangParser.InstruccionContext instr : ctx.ifBlock) {
+            visit(instr);
         }
+
+        for (MiniLangParser.InstruccionContext instr : ctx.elseBlock) {
+            visit(instr);
+        }
+
         return null;
     }
 
-    
-    // ---------------- Do-While ----------------
+    // ---------- Do-While ----------
     @Override
-    public Object visitDoWhile(MiniLangParser.DoWhileContext ctx) {
-        Object condition;
-        do {
-            for (MiniLangParser.InstruccionContext instr : ctx.instruccion()) {
-                visit(instr);
-            }
-            condition = visit(ctx.expresion());
-            if (!(condition instanceof Boolean)) {
-                throw new RuntimeException("La condición del do-while debe ser booleana");
-            }
-        } while ((Boolean) condition);
+    public String visitDoWhile(MiniLangParser.DoWhileContext ctx) {
+        for (MiniLangParser.InstruccionContext instr : ctx.instruccion()) {
+            visit(instr);
+        }
+
+        String conditionType = visit(ctx.expresion());
+
+        if (!conditionType.equals("bool")) {
+            throw new RuntimeException("La condición del do-while debe ser booleana");
+        }
+
         return null;
     }
 
-    
-    // ---------------- Expresiones ----------------
+    // ---------- Expresiones lógicas ----------
     @Override
-    public Object visitExpresionLogica(MiniLangParser.ExpresionLogicaContext ctx) {
-        Object left = visit(ctx.expresionRelacional(0));
-        if (ctx.expresionRelacional().size() == 1) return left;
+    public String visitExpresionLogica(MiniLangParser.ExpresionLogicaContext ctx) {
+        String leftType = visit(ctx.expresionRelacional(0));
+
+        if (ctx.expresionRelacional().size() == 1) {
+            return leftType;
+        }
 
         for (int i = 1; i < ctx.expresionRelacional().size(); i++) {
-            Object right = visit(ctx.expresionRelacional(i));
-            String op = ctx.getChild(2 * i - 1).getText();
-            if (!(left instanceof Boolean) || !(right instanceof Boolean)) {
-                throw new RuntimeException("Operador lógico requiere booleanos");
+            String rightType = visit(ctx.expresionRelacional(i));
+
+            if (!leftType.equals("bool") || !rightType.equals("bool")) {
+                throw new RuntimeException("Los operadores lógicos requieren booleanos");
             }
-            left = op.equals("&&") ? (Boolean) left && (Boolean) right
-                                   : (Boolean) left || (Boolean) right;
+
+            leftType = "bool";
         }
-        return left;
+
+        return "bool";
     }
 
-    
+    // ---------- Expresiones relacionales ----------
     @Override
-    public Object visitExpresionRelacional(MiniLangParser.ExpresionRelacionalContext ctx) {
-        Object left = visit(ctx.expresionAritmetica(0));
-        if (ctx.expresionAritmetica().size() == 1) return left;
+    public String visitExpresionRelacional(MiniLangParser.ExpresionRelacionalContext ctx) {
+        String leftType = visit(ctx.expresionAritmetica(0));
 
-        Object right = visit(ctx.expresionAritmetica(1));
+        if (ctx.expresionAritmetica().size() == 1) {
+            return leftType;
+        }
+
+        String rightType = visit(ctx.expresionAritmetica(1));
         String op = ctx.getChild(1).getText();
-
-        // Comparaciones de igualdad funcionan con cualquier tipo
-        if (op.equals("==")) {
-            return left.equals(right);
-        }
-        if (op.equals("!=")) {
-            return !left.equals(right);
+        
+        if (op.equals("==") || op.equals("!=")) {
+            return "bool";
         }
 
-        // Números para <, <=, >, >= 
-        if (!(left instanceof Number) || !(right instanceof Number)) {
-            throw new RuntimeException("Operación relacional inválida: " +
-                                       left.getClass().getSimpleName() + " " + op + " " +
-                                       right.getClass().getSimpleName());
+        if (!isNumeric(leftType, rightType)) {
+            throw new RuntimeException(
+                "Operación relacional inválida entre " + leftType + " y " + rightType
+            );
         }
 
-        double l = ((Number) left).doubleValue();
-        double r = ((Number) right).doubleValue();
-
-        switch (op) {
-            case "<":  return l < r;
-            case "<=": return l <= r;
-            case ">":  return l > r;
-            case ">=": return l >= r;
-        }
-        return null;
+        return "bool";
     }
 
-    
+    // ---------- Expresiones aritméticas ----------
     @Override
-    public Object visitExpresionAritmetica(MiniLangParser.ExpresionAritmeticaContext ctx) {
-        Object result = visit(ctx.termino(0));
+    public String visitExpresionAritmetica(MiniLangParser.ExpresionAritmeticaContext ctx) {
+        String resultType = visit(ctx.termino(0));
 
         for (int i = 1; i < ctx.termino().size(); i++) {
-            Object right = visit(ctx.termino(i));
-            String op = ctx.getChild(2 * i - 1).getText();
+            String rightType = visit(ctx.termino(i));
 
-            if (!(result instanceof Number) || !(right instanceof Number)) {
-                throw new RuntimeException("Operación aritmética inválida: " +
-                                           result.getClass().getSimpleName() + " " + op + " " +
-                                           right.getClass().getSimpleName());
+            if (!isNumeric(resultType) || !isNumeric(rightType)) {
+                throw new RuntimeException(
+                    "Operación aritmética inválida entre " + resultType + " y " + rightType
+                );
             }
 
-            // Si alguno es Double
-            boolean useDouble = (result instanceof Double) || (right instanceof Double);
-
-            if (useDouble) {
-                double l = ((Number) result).doubleValue();
-                double r = ((Number) right).doubleValue();
-                result = op.equals("+") ? l + r : l - r;
+            if (resultType.equals("real") || rightType.equals("real")) {
+                resultType = "real";
             } else {
-                int l = ((Number) result).intValue();
-                int r = ((Number) right).intValue();
-                result = op.equals("+") ? l + r : l - r;
+                resultType = "int";
             }
         }
-        return result;
+
+        return resultType;
     }
 
-
+    // ---------- Términos ----------
     @Override
-    public Object visitTermino(MiniLangParser.TerminoContext ctx) {
-        Object result = visit(ctx.factor(0));
+    public String visitTermino(MiniLangParser.TerminoContext ctx) {
+        String resultType = visit(ctx.factor(0));
+
         for (int i = 1; i < ctx.factor().size(); i++) {
-            Object right = visit(ctx.factor(i));
+            String rightType = visit(ctx.factor(i));
             String op = ctx.getChild(2 * i - 1).getText();
 
-            if (!(result instanceof Number) || !(right instanceof Number)) {
-                throw new RuntimeException("Operación aritmética requiere números");
+            if (!isNumeric(resultType) || !isNumeric(rightType)) {
+                throw new RuntimeException(
+                    "Operación aritmética inválida entre " + resultType + " y " + rightType
+                );
+            }
+            
+            // Validación de división por cero
+            if (op.equals("/")) {
+                // Si el factor derecho es un literal entero o real con valor 0
+                if (ctx.factor(i).ENTERO() != null && ctx.factor(i).getText().equals("0")) {
+                    throw new RuntimeException("No se puede dividir por 0");
+                }
+                if (ctx.factor(i).REAL() != null && ctx.factor(i).getText().equals("0.0")) {
+                	throw new RuntimeException("No se puede dividir por 0");
+                }
             }
 
-            boolean useDouble = (result instanceof Double) || (right instanceof Double);
-
-            if (useDouble) {
-                double l = ((Number) result).doubleValue();
-                double r = ((Number) right).doubleValue();
-                if (op.equals("/") && r == 0.0) {
-                    throw new RuntimeException("No se puede realizar una división por cero");
-                }
-                result = op.equals("*") ? l * r : l / r;
+            if (resultType.equals("real") || rightType.equals("real")) {
+                resultType = "real";
             } else {
-                int l = ((Number) result).intValue();
-                int r = ((Number) right).intValue();
-                if (op.equals("/") && r == 0) {
-                    throw new RuntimeException("No se puede realizar una división por cero");
-                }
-                result = op.equals("*") ? l * r : l / r;
+                resultType = "int";
             }
         }
-        return result;
+
+        return resultType;
     }
 
-    
+    // ---------- Factor ----------
     @Override
-    public Object visitFactor(MiniLangParser.FactorContext ctx) {
-        if (ctx.CADENA() != null) return ctx.CADENA().getText().replace("\"", "");
-        if (ctx.ENTERO() != null) return Integer.parseInt(ctx.ENTERO().getText());
-        if (ctx.REAL() != null) return Double.parseDouble(ctx.REAL().getText());
-        if (ctx.BOOLEANO() != null) return Boolean.parseBoolean(ctx.BOOLEANO().getText());
+    public String visitFactor(MiniLangParser.FactorContext ctx) {
+        if (ctx.CADENA() != null) return "string";
+        if (ctx.ENTERO() != null) return "int";
+        if (ctx.REAL() != null) return "real";
+        if (ctx.BOOLEANO() != null) return "bool";
+
         if (ctx.ID() != null) {
-            if (!symbolTable.exists(ctx.ID().getText())) {
-                throw new RuntimeException("Variable no declarada: " + ctx.ID().getText());
+            String name = ctx.ID().getText();
+
+            if (!symbolTable.exists(name)) {
+                throw new RuntimeException("Variable no declarada: " + name);
             }
-            return symbolTable.getValue(ctx.ID().getText());
+
+            return symbolTable.getType(name);
         }
-        if (ctx.expresion() != null) return visit(ctx.expresion());
+
+        if (ctx.expresion() != null) {
+            return visit(ctx.expresion());
+        }
+
         return null;
     }
 
+    // ---------- Auxiliares ----------
+    private boolean isCompatible(String declaredType, String exprType) {
+        if (declaredType.equals(exprType)) return true;
 
-    // ---------------- Auxiliares ----------------
-    private boolean isCompatible(String type, Object value) {
-        switch (type) {
-            case "int":    return value instanceof Integer;
-            case "real":   return value instanceof Double || value instanceof Integer;
-            case "string": return value instanceof String;
-            case "bool":   return value instanceof Boolean;
-            default:       return false;
-        }
+        // Permitir asignar int a real
+        if (declaredType.equals("real") && exprType.equals("int")) return true;
+
+        return false;
     }
 
+    private boolean isNumeric(String type) {
+        return type.equals("int") || type.equals("real");
+    }
+
+    private boolean isNumeric(String left, String right) {
+        return isNumeric(left) && isNumeric(right);
+    }
 }
