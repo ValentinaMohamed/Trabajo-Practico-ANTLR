@@ -66,11 +66,13 @@ public class Main {
 				"   print(\"Desaprobado\");\n" +
 				"}\n" +
 				
+				
 				"// If simple\n" +
 				
 				"if (nota >= 8) {\n" +
 				"   print(\"Muy buena nota\");\n" +
 				"}\n" +
+				
     		    
     		    "// Do while\n" +
     		    
@@ -89,8 +91,6 @@ public class Main {
         MiniLangParser parser = new MiniLangParser(tokens);
         ParseTree tree = parser.programa();
 
-        // Salida
-        // System.out.println(tree.toStringTree(parser));
         
         // 1. Imprimir árbol sintáctico
         //printTree(tree, parser, 0);
@@ -101,7 +101,13 @@ public class Main {
         // 3. Ejecutar analizador semántico
         SemanticAnalyzer semantic = new SemanticAnalyzer(symbolTable);
         semantic.visit(tree);
+        System.out.println("Análisis semántico completado sin errores\n");
+        
+        // 4. Crear tabla para ejecución
+        SymbolTable runtimeTable = new SymbolTable();
 
-        System.out.println("Análisis semántico completado sin errores");
+        // 5. Ejecutar intérprete
+        Interpreter interpreter = new Interpreter(runtimeTable);
+        interpreter.visit(tree);
     }
 }

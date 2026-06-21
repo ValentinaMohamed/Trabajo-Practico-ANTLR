@@ -52,8 +52,8 @@ termino
 
 factor
     : CADENA
-    | ENTERO
-    | REAL
+    | ('+'|'-')? ENTERO
+    | ('+'|'-')? REAL
     | BOOLEANO
     | ID
     | '(' expresion ')'
