@@ -66,6 +66,11 @@ public class Main {
 				"   print(\"Desaprobado\");\n" +
 				"}\n" +
 				
+				"// If simple\n" +
+				
+				"if (nota >= 8) {\n" +
+				"   print(\"Muy buena nota\");\n" +
+				"}\n" +
     		    
     		    "// Do while\n" +
     		    

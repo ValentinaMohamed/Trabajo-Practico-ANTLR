@@ -60,7 +60,24 @@ public class SemanticAnalyzer extends MiniLangBaseVisitor<Object> {
         System.out.println(value);
         return null;
     }
+    
+    // ---------------- If ----------------
+    @Override
+    public Object visitIfSimple(MiniLangParser.IfSimpleContext ctx) {
+        Object condition = visit(ctx.expresion());
 
+        if (!(condition instanceof Boolean)) {
+            throw new RuntimeException("La condición del if debe ser booleana");
+        }
+
+        if ((Boolean) condition) {
+            for (MiniLangParser.InstruccionContext instr : ctx.instruccion()) {
+                visit(instr);
+            }
+        }
+
+        return null;
+    }
     
     // ---------------- If-Else ----------------
     @Override
