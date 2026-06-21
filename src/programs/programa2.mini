@@ -1,0 +1,43 @@
+// Programa 2: Operaciones aritméticas, relacionales y prueba error semantico
+
+print("variable x = 5");
+var x : int = 5;
+print("variable y = 10.0");
+var y : real = 10.0;
+
+var suma : int = x + 3;
+var resta : int = 2 - x;
+var multiplicacion : real = 4 * y;
+var division : real = y / 2;
+var mayor : bool = x > y;
+
+print("");
+
+print("operacion: x + 3 =");
+print(suma);
+
+print("");
+
+print("operacion: 2 - x =");
+print(resta);
+
+print("");
+
+print("operacion: 4 * y =");
+print(multiplicacion);
+
+print("");
+
+print("operacion: y / 2 =");
+print(division);
+
+print("");
+
+print("operacion: x > y =");
+print(mayor);
+
+print("");
+
+print("Prueba division por 0");
+print("operacion: x / 0");
+var divisionPorCero : int = x / 0;

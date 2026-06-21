@@ -16,98 +16,52 @@ public class Main {
 	
     public static void main(String[] args) throws Exception {
 
-    	// Simula un archivo fuente con el código
-    	CharStream input = CharStreams.fromString(
+    	// Extraer codigo fuente de archivos de extensión .mini
+    	String[] archivos = {
+    			"src/programs/programa1.mini",
+    		    "src/programs/programa2.mini",
+    		    "src/programs/programa3.mini"
+    		};
+    	
+    	int contador = 0;
+
+    		for (String archivo : archivos) {
     			
-    			"// Declaración de variables\n" +
-    			
-    		    "var saludo : string = \"Hola\";\n" +
-    		    "var numero : int = 1234;\n" +
-    		    "var numero_real : real = 98.3;\n" +
-    		    "var boolean : bool = true;\n" +
-    		    
-    		    
-                "// Expresiones\n" +
-                
-                "var suma : int = numero + 10;\n" +
-                "var resta : int = numero - 10;\n" +
-                "var multiplicacion : real = numero_real * 2;\n" +
-                "var division : real = numero_real / 2;\n" +
-                "var comparacion : bool = numero > 100;\n" +
-                "var logico : bool = comparacion && true;\n" +
-    		    
-                
-                "/* Impresión de variables */\n" +
+    			contador++;
+    		    System.out.println("=============== Ejecutando programa " + contador + " ===============");
 
-    		    "print(saludo);\n" +
-    		    "print(numero);\n" +
-    		    "print(numero_real);\n" +
-    		    "print(boolean);\n" +
-    		    "print(suma);\n" +
-    		    "print(resta);\n" +
-    		    "print(multiplicacion);\n" +
-    		    "print(division);\n" +
-    		    "print(comparacion);\n" +
-    		    "print(logico);\n" +
+    		    CharStream input = CharStreams.fromFileName(archivo);
     		    
-    		    
-                "// Cambio de valor\n" +
-    		    
-    		    "saludo = \"Chau\";\n" +
-    		    "print(saludo);\n" +
-    		    
-				
-				"// Condicional if-else\n" +
+    		    // Convierte el texto en tokens
+    		    MiniLangLexer lexer = new MiniLangLexer(input);
+    		    // Agrupa los tokens para que el parser los consuma
+    		    CommonTokenStream tokens = new CommonTokenStream(lexer);
+    		    // Usa la gramática para construir el árbol sintáctico.
+    		    MiniLangParser parser = new MiniLangParser(tokens);
+    		    ParseTree tree = parser.programa();
 
-				"var nota : int = 8;\n" +
-				"if (nota >= 6) {\n" +
-				"   print(\"Aprobado\");\n" +
-				"} else {\n" +
-				"   print(\"Desaprobado\");\n" +
-				"}\n" +
-				
-				
-				"// If simple\n" +
-				
-				"if (nota >= 8) {\n" +
-				"   print(\"Muy buena nota\");\n" +
-				"}\n" +
-				
-    		    
-    		    "// Do while\n" +
-    		    
-    		    "var i : int = 0;\n" +
-    		    "do {\n" +
-    		    "   print(i);\n" +
-    		    "   i = i + 1;\n" +
-    		    "} while (i < 5);\n"
-    		);
+    		    // Analizador semántico
+    		    SymbolTable symbolTable = new SymbolTable();
+    		    SemanticAnalyzer semantic = new SemanticAnalyzer(symbolTable);
+    		    try {
+    		        semantic.visit(tree);
+    		        System.out.println("Análisis semántico completado\n");
+    		    } catch (RuntimeException e) {
+    		        System.out.println("Error semántico: " + e.getMessage() + "\n");
+    		    }
 
-        // Convierte el texto en tokens
-        MiniLangLexer lexer = new MiniLangLexer(input);
-        // Agrupa los tokens para que el parser los consuma.
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        // Usa la gramática para construir el árbol sintáctico.
-        MiniLangParser parser = new MiniLangParser(tokens);
-        ParseTree tree = parser.programa();
+    		    // Intérprete
+    		    SymbolTable runtimeTable = new SymbolTable();
+    		    Interpreter interpreter = new Interpreter(runtimeTable);
+    		    try {
+    		        interpreter.visit(tree);
+    		        System.out.println("\nEjecución completada\n");
+    		    } catch (RuntimeException e) {
+    		        System.out.println("\nError en ejecución: " + e.getMessage() + "\n");
+    		    }
 
+    		    System.out.println();
+    		}
         
-        // 1. Imprimir árbol sintáctico
-        //printTree(tree, parser, 0);
-
-        // 2. Crear tabla de símbolos
-        SymbolTable symbolTable = new SymbolTable();
-
-        // 3. Ejecutar analizador semántico
-        SemanticAnalyzer semantic = new SemanticAnalyzer(symbolTable);
-        semantic.visit(tree);
-        System.out.println("Análisis semántico completado sin errores\n");
-        
-        // 4. Crear tabla para ejecución
-        SymbolTable runtimeTable = new SymbolTable();
-
-        // 5. Ejecutar intérprete
-        Interpreter interpreter = new Interpreter(runtimeTable);
-        interpreter.visit(tree);
     }
 }

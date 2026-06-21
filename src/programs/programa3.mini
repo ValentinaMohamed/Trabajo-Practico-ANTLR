@@ -1,0 +1,55 @@
+// Programa 3: If-Else y Do-While
+
+print("variable x1 = 2");
+print("variable x2 = 4");
+
+var x1 : int = 2;
+var x2 : int = 4;
+
+print("");
+
+// If-Else con condición booleana
+if (x1 >= x2) {
+    print("x1 es mayor o igual que x2");
+} else {
+    print("x1 es menor que x2");
+}
+
+print("");
+
+// Cambio de valores
+
+print("variable x1 = x1 * 2");
+x1 = x1 * 2;
+
+print("");
+
+// If-Else con condición booleana
+if (x1 >= x2) {
+    print("x1 es mayor o igual que x2");
+} else {
+    print("x1 es menor que x2");
+}
+
+// Bucle Do-While valido
+
+print("");
+print("Do-While con condicion valida");
+
+var i : int = 0;
+do {
+    print(i);
+    i = i + 1;
+} while (i < 3);
+
+
+// Bucle Do-While invalido
+
+print("");
+print("Do-While con condicion invalida");
+
+var j : int = 0;
+do {
+    print(j);
+    j = j + 1;
+} while (j < 0);

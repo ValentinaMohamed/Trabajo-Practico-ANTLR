@@ -1,0 +1,38 @@
+// Programa 1: Comparaciones de igualdad y desigualdad
+
+print("saludo = Hola");
+print("despedida = Chau");
+
+var saludo : string = "Hola";
+var despedida : string = "Chau";
+
+print("");
+
+var iguales : bool = saludo == despedida;   
+var distintos : bool = saludo != despedida; 
+
+/* Se compara la igualdad de las variables */
+
+print("son iguales?");
+print(iguales);
+print("son distintos?");
+print(distintos);
+
+print("");
+
+/* Cambio de valores */
+
+print("despedida = Hola");
+despedida = "Hola";
+
+print("");
+
+iguales = saludo == despedida;   
+distintos = saludo != despedida; 
+
+/* Se compara la igualdad de las variables */
+
+print("son iguales?");
+print(iguales);
+print("son distintos?");
+print(distintos);
