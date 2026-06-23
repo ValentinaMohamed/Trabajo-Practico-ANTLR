@@ -31,10 +31,10 @@ if (x1 >= x2) {
     print("x1 es menor que x2");
 }
 
-// Bucle Do-While valido
+// Bucle Do-While verdadero
 
 print("");
-print("Do-While con condicion valida");
+print("Do-While con condicion verdadera");
 
 var i : int = 0;
 do {
@@ -43,10 +43,10 @@ do {
 } while (i < 3);
 
 
-// Bucle Do-While invalido
+// Bucle Do-While falso
 
 print("");
-print("Do-While con condicion invalida");
+print("Do-While con condicion falsa");
 
 var j : int = 0;
 do {
