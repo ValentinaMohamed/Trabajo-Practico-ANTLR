@@ -97,18 +97,37 @@ Este proyecto utiliza **Java**, **ANTLR4** y **Maven** para la construcción y e
 Si en `programs/programa1.mini` se encuentra:
 
 ```bash
+// Declaración de variables
 var saludo : string = "Hola";
 print(saludo);
 
-var numero : int = -5;
+var numero : int = 3;
 print(numero);
+
+// Condicional if-else
+if (numero > 0) {
+    print("El número es positivo");
+} else {
+    print("El número no es positivo");
+}
+
+// Bucle do-while
+var i : int = 0;
+do {
+    print(i);
+    i = i + 1;
+} while (i < numero);
 ```
 
 La salida será:
 
 ```bash
 Hola
--5
+3
+El número es positivo
+0
+1
+2
 ```
 
 
